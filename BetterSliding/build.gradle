@@ -21,21 +21,25 @@ minecraft {
         configureEach {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
-
             mods {
                 "${mod_id}" {
                     source sourceSets.main
                 }
             }
         }
-
         client {
             workingDirectory project.file('run')
         }
-
         server {
             workingDirectory project.file('run')
         }
+    }
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.minecraft
+        runtimeClasspath += configurations.minecraft
     }
 }
 
