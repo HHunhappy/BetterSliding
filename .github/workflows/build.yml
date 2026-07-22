@@ -20,14 +20,14 @@ jobs:
 
       - name: Grant execute permission
         run: chmod +x gradlew
-        working-directory: BetterSliding/BetterSliding
+        working-directory: BetterSliding
 
       - name: Build
         run: ./gradlew build --no-daemon
-        working-directory: BetterSliding/BetterSliding
+        working-directory: BetterSliding
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
           name: BetterSliding
-          path: BetterSliding/BetterSliding/build/libs/*.jar
+          path: BetterSliding/build/libs/*.jar
