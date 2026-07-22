@@ -10,22 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Grant execute permission
-        run: chmod +x gradlew
+        run: chmod +x BetterSliding/gradlew
 
       - name: Build
+        working-directory: BetterSliding
         run: ./gradlew build --no-daemon
 
       - name: Upload JAR
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: BetterSliding
-          path: build/libs/*.jar
+          path: BetterSliding/build/libs/*.jar
