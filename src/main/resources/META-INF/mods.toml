@@ -1,0 +1,14 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+license = "MIT"
+
+[[mods]]
+modId = "bettersliding"
+version = "${mod_version}"
+displayName = "BetterSliding"
+authors = "User"
+description = '''
+Adds a sliding mechanic to Minecraft.
+Sprint and press Left Ctrl to slide.
+Press jump during a slide to perform a slide jump with forward-upward momentum.
+'''
