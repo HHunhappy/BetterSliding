@@ -19,14 +19,15 @@ jobs:
           distribution: 'temurin'
 
       - name: Grant execute permission
-        run: chmod +x BetterSliding/gradlew
+        run: chmod +x gradlew
+        working-directory: BetterSliding/BetterSliding
 
       - name: Build
-        working-directory: BetterSliding
         run: ./gradlew build --no-daemon
+        working-directory: BetterSliding/BetterSliding
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
           name: BetterSliding
-          path: BetterSliding/build/libs/*.jar
+          path: BetterSliding/BetterSliding/build/libs/*.jar
