@@ -1,7 +1,6 @@
 plugins {
     id 'java-library'
     id 'net.neoforged.gradle' version '[6.0.18,6.2)'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
 group = mod_group_id
@@ -10,26 +9,14 @@ version = mod_version
 base { archivesName = mod_id }
 
 minecraft {
-    mappings channel: 'parchment', version: '2023.09.03-1.20.1'
     runs {
         client { workingDirectory project.file('run') }
         server { workingDirectory project.file('run') }
     }
 }
 
-repositories {
-    maven { name = 'ParchmentMC'; url = 'https://maven.parchmentmc.org' }
-}
-
 dependencies {
     minecraft "net.neoforged:forge:${minecraft_version}-${neo_version}"
-}
-
-compileJava.doFirst {
-    def inj = file("${project.gradle.gradleUserHomeDir}/caches/forge_gradle/minecraft_user_repo/net/neoforged/forge/${minecraft_version}-${neo_version}/forge-${minecraft_version}-${neo_version}-injected.jar")
-    if (inj.exists()) {
-        classpath = classpath + files(inj)
-    }
 }
 
 tasks.withType(JavaCompile).configureEach {
