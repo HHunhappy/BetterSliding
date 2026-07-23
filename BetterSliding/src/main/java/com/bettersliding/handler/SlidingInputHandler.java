@@ -1,54 +1,52 @@
-package com.bettersliding.handler;
+package com.bettersliding.network;
 
 import com.bettersliding.BetterSliding;
-import com.bettersliding.network.SlidingPacketHandler;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.event.TickEvent;
-import org.lwjgl.glfw.GLFW;
+import com.bettersliding.handler.SlidingHandler;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 
-@Mod.EventBusSubscriber(modid = BetterSliding.MOD_ID, value = Dist.CLIENT)
-public class SlidingInputHandler {
+import java.util.function.Supplier;
 
-    public static KeyMapping SLIDE_KEY;
-    private static boolean wasSlideKeyDown = false;
+public class SlidingPacketHandler {
 
-    public static void initKeyMapping() {
-        SLIDE_KEY = new KeyMapping(
-                "key.bettersliding.slide",
-                GLFW.GLFW_KEY_LEFT_CONTROL,
-                "key.categories.bettersliding");
+    private static final String PROTOCOL_VERSION = "1";
+
+    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
+            new ResourceLocation(BetterSliding.MOD_ID, "main"),
+            () -> PROTOCOL_VERSION,
+            PROTOCOL_VERSION::equals,
+            PROTOCOL_VERSION::equals);
+
+    public static void register() {
+        CHANNEL.registerMessage(0, StartSlidePacket.class,
+                StartSlidePacket::encode,
+                StartSlidePacket::decode,
+                StartSlidePacket::handle);
     }
 
-    @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
-
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.level == null) {
-            wasSlideKeyDown = false;
-            return;
-        }
-
-        boolean isKeyDown = SLIDE_KEY.isDown();
-
-        if (isKeyDown && !wasSlideKeyDown && canSlideLocally(mc.player)) {
-            SlidingPacketHandler.sendStartSlide();
-        }
-
-        wasSlideKeyDown = isKeyDown;
+    public static void sendStartSlide() {
+        CHANNEL.sendToServer(new StartSlidePacket());
     }
 
-    private static boolean canSlideLocally(LocalPlayer player) {
-        return player.isSprinting()
-                && player.onGround()
-                && !player.isFallFlying()
-                && !player.isSwimming()
-                && !player.isPassenger()
-                && !player.getAbilities().flying;
+    public record StartSlidePacket() {
+        public static StartSlidePacket decode(FriendlyByteBuf buf) {
+            return new StartSlidePacket();
+        }
+        public void encode(FriendlyByteBuf buf) {}
+
+        public static void handle(StartSlidePacket msg, Supplier<NetworkEvent.Context> ctxSupplier) {
+            NetworkEvent.Context ctx = ctxSupplier.get();
+            ctx.enqueueWork(() -> {
+                ServerPlayer player = ctx.getSender();
+                if (player != null) {
+                    SlidingHandler.startSlide(player);
+                }
+            });
+            ctx.setPacketHandled(true);
+        }
     }
 }
