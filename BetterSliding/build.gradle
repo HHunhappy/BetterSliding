@@ -36,8 +36,6 @@ repositories {
 dependencies {
     minecraft "net.neoforged:forge:${minecraft_version}-${neo_version}"
 }
-    minecraft "net.neoforged:forge:${minecraft_version}-${neo_version}"
-}
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
