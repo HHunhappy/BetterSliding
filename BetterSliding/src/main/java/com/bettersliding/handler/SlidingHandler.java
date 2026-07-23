@@ -9,7 +9,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
-import net.neoforged.neoforge.event.entity.living.LivingJumpEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 import java.util.Map;
@@ -49,22 +48,24 @@ public class SlidingHandler {
             return;
         }
 
+        // Detect slide jump via player leaving ground during slide
+        if (!player.onGround() && player.getDeltaMovement().y > 0.1) {
+            performSlideJump(player, data);
+            return;
+        }
+
         data.slideTick++;
 
         boolean shouldEnd = false;
-
         if (data.slideTick >= SlidingConfig.slideDurationTicks.get()) {
             shouldEnd = true;
         }
-
         if (!player.onGround() && data.slideTick > 5) {
             shouldEnd = true;
         }
-
         if (player.isPassenger() || player.isFallFlying() || player.isSwimming()) {
             shouldEnd = true;
         }
-
         if (shouldEnd) {
             endSlide(player, data);
             return;
@@ -72,7 +73,6 @@ public class SlidingHandler {
 
         Vec3 currentMotion = player.getDeltaMovement();
         double horizSpeed = currentMotion.horizontalDistance();
-
         if (horizSpeed < 0.05 && data.slideTick > 3) {
             endSlide(player, data);
             return;
@@ -89,60 +89,9 @@ public class SlidingHandler {
         }
     }
 
-    public static void startSlide(ServerPlayer player) {
-        if (!player.isSprinting()) return;
-        if (!player.onGround()) return;
-        if (player.isFallFlying() || player.isSwimming() || player.isPassenger()) return;
-        if (player.getAbilities().flying) return;
-
-        SlidingData data = SLIDING_PLAYERS.computeIfAbsent(
-                player.getUUID(), u -> new SlidingData());
-
-        if (data.isSliding) return;
-        if (data.cooldownTick > 0) return;
-        if (player.getFoodData().getFoodLevel() <= 0) return;
-
-        data.isSliding = true;
-        data.slideTick = 0;
-        data.direction = new Vec3(
-                player.getLookAngle().x, 0, player.getLookAngle().z).normalize();
-
+    private static void performSlideJump(Player player, SlidingData data) {
         Vec3 currentMotion = player.getDeltaMovement();
-        double initialSpeed = currentMotion.horizontalDistance()
-                * SlidingConfig.slideInitialSpeedMultiplier.get();
-        if (initialSpeed < 0.3) initialSpeed = 0.3;
-
-        player.setDeltaMovement(
-                data.direction.x * initialSpeed,
-                currentMotion.y,
-                data.direction.z * initialSpeed);
-
-        player.setPose(Pose.CROUCHING);
-        player.causeFoodExhaustion(
-                (float) SlidingConfig.slideExhaustionCost.get());
-    }
-
-    private static void endSlide(Player player, SlidingData data) {
-        data.isSliding = false;
-        data.cooldownTick = SlidingConfig.slideCooldownTicks.get();
-
-        if (player.getPose() == Pose.CROUCHING && !player.isShiftKeyDown()) {
-            player.setPose(Pose.STANDING);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onLivingJump(LivingJumpEvent event) {
-        if (!(event.getEntity() instanceof Player player)) return;
-        if (player.level().isClientSide) return;
-
-        SlidingData data = SLIDING_PLAYERS.get(player.getUUID());
-        if (data == null || !data.isSliding) return;
-
-        Vec3 currentMotion = player.getDeltaMovement();
-        Vec3 look = new Vec3(
-                player.getLookAngle().x, 0, player.getLookAngle().z).normalize();
-
+        Vec3 look = new Vec3(player.getLookAngle().x, 0, player.getLookAngle().z).normalize();
         double horizBoost = SlidingConfig.slideJumpHorizontalBoost.get();
         double vertMultiplier = SlidingConfig.slideJumpVerticalMultiplier.get();
 
@@ -151,10 +100,40 @@ public class SlidingHandler {
                 currentMotion.y * vertMultiplier,
                 currentMotion.z + look.z * horizBoost);
 
-        player.causeFoodExhaustion(
-                (float) SlidingConfig.slideJumpExhaustionCost.get());
-
+        player.causeFoodExhaustion(SlidingConfig.slideJumpExhaustionCost.get().floatValue());
         endSlide(player, data);
+    }
+
+    public static void startSlide(ServerPlayer player) {
+        if (!player.isSprinting()) return;
+        if (!player.onGround()) return;
+        if (player.isFallFlying() || player.isSwimming() || player.isPassenger()) return;
+        if (player.getAbilities().flying) return;
+
+        SlidingData data = SLIDING_PLAYERS.computeIfAbsent(player.getUUID(), u -> new SlidingData());
+        if (data.isSliding) return;
+        if (data.cooldownTick > 0) return;
+        if (player.getFoodData().getFoodLevel() <= 0) return;
+
+        data.isSliding = true;
+        data.slideTick = 0;
+        data.direction = new Vec3(player.getLookAngle().x, 0, player.getLookAngle().z).normalize();
+
+        Vec3 currentMotion = player.getDeltaMovement();
+        double initialSpeed = currentMotion.horizontalDistance() * SlidingConfig.slideInitialSpeedMultiplier.get();
+        if (initialSpeed < 0.3) initialSpeed = 0.3;
+
+        player.setDeltaMovement(data.direction.x * initialSpeed, currentMotion.y, data.direction.z * initialSpeed);
+        player.setPose(Pose.CROUCHING);
+        player.causeFoodExhaustion(SlidingConfig.slideExhaustionCost.get().floatValue());
+    }
+
+    private static void endSlide(Player player, SlidingData data) {
+        data.isSliding = false;
+        data.cooldownTick = SlidingConfig.slideCooldownTicks.get();
+        if (player.getPose() == Pose.CROUCHING && !player.isShiftKeyDown()) {
+            player.setPose(Pose.STANDING);
+        }
     }
 
     @SubscribeEvent
