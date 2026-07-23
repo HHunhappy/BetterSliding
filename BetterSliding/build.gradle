@@ -9,6 +9,7 @@ version = mod_version
 base { archivesName = mod_id }
 
 minecraft {
+    mappings channel: 'official', version: '1.20.1'
     runs {
         client { workingDirectory project.file('run') }
         server { workingDirectory project.file('run') }
