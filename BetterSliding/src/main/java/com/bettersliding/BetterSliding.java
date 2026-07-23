@@ -17,7 +17,7 @@ public class BetterSliding {
     public BetterSliding(ModContainer container, IEventBus modEventBus) {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
-        container.registerConfig(ModConfig.Type.SERVER, SlidingConfig.SPEC);
+        container.registerConfig(ModConfig.Type.SERVER, SlidingConfig.SPEC, "bettersliding-server.toml");
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
