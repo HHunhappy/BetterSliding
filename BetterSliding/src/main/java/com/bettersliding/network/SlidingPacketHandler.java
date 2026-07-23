@@ -33,14 +33,10 @@ public class SlidingPacketHandler {
     }
 
     public record StartSlidePacket() {
-
         public static StartSlidePacket decode(FriendlyByteBuf buf) {
             return new StartSlidePacket();
         }
-
-        public void encode(FriendlyByteBuf buf) {
-            // No data to transmit
-        }
+        public void encode(FriendlyByteBuf buf) {}
 
         public static void handle(StartSlidePacket msg, Supplier<NetworkEvent.Context> ctxSupplier) {
             NetworkEvent.Context ctx = ctxSupplier.get();
