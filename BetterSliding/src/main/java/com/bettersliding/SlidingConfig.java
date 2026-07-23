@@ -1,21 +1,21 @@
 package com.bettersliding;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 public class SlidingConfig {
 
-    public static final ModConfigSpec SPEC;
+    public static final ForgeConfigSpec SPEC;
 
-    public static final ModConfigSpec.DoubleValue slideExhaustionCost;
-    public static final ModConfigSpec.DoubleValue slideJumpExhaustionCost;
-    public static final ModConfigSpec.IntValue slideDurationTicks;
-    public static final ModConfigSpec.IntValue slideCooldownTicks;
-    public static final ModConfigSpec.DoubleValue slideInitialSpeedMultiplier;
-    public static final ModConfigSpec.DoubleValue slideJumpHorizontalBoost;
-    public static final ModConfigSpec.DoubleValue slideJumpVerticalMultiplier;
+    public static final ForgeConfigSpec.DoubleValue slideExhaustionCost;
+    public static final ForgeConfigSpec.DoubleValue slideJumpExhaustionCost;
+    public static final ForgeConfigSpec.IntValue slideDurationTicks;
+    public static final ForgeConfigSpec.IntValue slideCooldownTicks;
+    public static final ForgeConfigSpec.DoubleValue slideInitialSpeedMultiplier;
+    public static final ForgeConfigSpec.DoubleValue slideJumpHorizontalBoost;
+    public static final ForgeConfigSpec.DoubleValue slideJumpVerticalMultiplier;
 
     static {
-        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
         builder.comment("BetterSliding Configuration").push("general");
 
