@@ -35,11 +35,9 @@ public class SlidingInputHandler {
         }
 
         boolean isKeyDown = SLIDE_KEY.isDown();
-
         if (isKeyDown && !wasSlideKeyDown && canSlideLocally(mc.player)) {
             SlidingPacketHandler.sendStartSlide();
         }
-
         wasSlideKeyDown = isKeyDown;
     }
 
