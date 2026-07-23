@@ -4,48 +4,32 @@ plugins {
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
 group = mod_group_id
 version = mod_version
 
-base {
-    archivesName = mod_id
-}
+base { archivesName = mod_id }
 
 minecraft {
     mappings channel: 'parchment', version: '2023.09.03-1.20.1'
-
     runs {
-        client {
-            workingDirectory project.file('run')
-        }
-
-        server {
-            workingDirectory project.file('run')
-        }
+        client { workingDirectory project.file('run') }
+        server { workingDirectory project.file('run') }
     }
 }
 
 repositories {
-    maven {
-        name = 'ParchmentMC'
-        url = 'https://maven.parchmentmc.org'
-    }
-}
-
-configurations {
-    neoforgeForCompile
+    maven { name = 'ParchmentMC'; url = 'https://maven.parchmentmc.org' }
 }
 
 dependencies {
-    neoforgeForCompile "net.neoforged:forge:${minecraft_version}-${neo_version}"
     minecraft "net.neoforged:forge:${minecraft_version}-${neo_version}"
 }
 
-afterEvaluate {
-    sourceSets.main.compileClasspath += configurations.neoforgeForCompile
-    sourceSets.main.compileClasspath += sourceSets.main.runtimeClasspath
+compileJava.doFirst {
+    def inj = file("${project.gradle.gradleUserHomeDir}/caches/forge_gradle/minecraft_user_repo/net/neoforged/forge/${minecraft_version}-${neo_version}/forge-${minecraft_version}-${neo_version}-injected.jar")
+    if (inj.exists()) {
+        classpath = classpath + files(inj)
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
