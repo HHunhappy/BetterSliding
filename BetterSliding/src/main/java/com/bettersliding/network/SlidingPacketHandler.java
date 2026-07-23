@@ -5,9 +5,9 @@ import com.bettersliding.handler.SlidingHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.NetworkEvent;
-import net.neoforged.neoforge.network.NetworkRegistry;
-import net.neoforged.neoforge.network.simple.SimpleChannel;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 import java.util.function.Supplier;
 
@@ -33,14 +33,10 @@ public class SlidingPacketHandler {
     }
 
     public record StartSlidePacket() {
-
         public static StartSlidePacket decode(FriendlyByteBuf buf) {
             return new StartSlidePacket();
         }
-
-        public void encode(FriendlyByteBuf buf) {
-            // No data to transmit
-        }
+        public void encode(FriendlyByteBuf buf) {}
 
         public static void handle(StartSlidePacket msg, Supplier<NetworkEvent.Context> ctxSupplier) {
             NetworkEvent.Context ctx = ctxSupplier.get();
