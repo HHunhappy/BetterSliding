@@ -21,9 +21,9 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
         working-directory: BetterSliding
-
+      
       - name: Build
-        run: ./gradlew build --no-daemon
+        run: ./gradlew clean build --no-daemon
         working-directory: BetterSliding
 
       - name: Upload JAR
