@@ -20,10 +20,10 @@ dependencies {
     minecraft "net.neoforged:forge:${minecraft_version}-${neo_version}"
 }
 
-compileJava.doFirst {
+afterEvaluate {
     def inj = file("${project.gradle.gradleUserHomeDir}/caches/forge_gradle/minecraft_user_repo/net/neoforged/forge/${minecraft_version}-${neo_version}/forge-${minecraft_version}-${neo_version}-injected.jar")
     if (inj.exists()) {
-        classpath += files(inj)
+        compileJava.classpath += files(inj)
     }
 }
 
